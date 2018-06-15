@@ -10,9 +10,8 @@ function initMap() {
             userPos = pos;
             map.setCenter(pos);
         })
-        .then(() => {
-            getPubs();
-        })
+        .then(getPubs)
+        .then(getRoute);
 }
 
 function getUserLocation() {
@@ -41,18 +40,43 @@ function getPubs() {
         radius: 1000,
         type: 'bar',
         openNow: true
-
     }
 
     service = new google.maps.places.PlacesService(map);
-    service.nearbySearch(request, (results, status) => {
-        if (status == google.maps.places.PlacesServiceStatus.OK) {
-            for (var i = 0; i < results.length; i++) {
-                var place = results[i];
-                console.info(place);
+
+    return new Promise((resolve, reject) => {
+        service.nearbySearch(request, (results, status) => {
+            if (status == google.maps.places.PlacesServiceStatus.OK) {
+                resolve(results.slice(0, 5));
+            } else {
+                console.warn('PlaceService Error', status, results);
+                reject();
             }
-        } else {
-            console.warn('PlaceService Error', status, results);
-        }
+        });
     });
+}
+
+function getRoute(pubs) {
+
+    const waypoints = pubs.map(p => {
+        return { stopover: true, location: p.geometry.location };
+    })
+    console.info(pubs, waypoints);
+    service = new google.maps.DirectionsService();
+    return new Promise((resolve, reject) => {
+        service.route({
+            origin: userPos,
+            destination: userPos,
+            waypoints: waypoints,
+            travelMode: 'WALKING',
+            optimizeWaypoints: true
+        }, (result, status) => {
+            if (status === 'OK') {
+                resolve(result);
+            } else {
+                console.warn('Route error', status, results);
+                reject();
+            }
+        });
+    })
 }
