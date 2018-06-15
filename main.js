@@ -11,7 +11,8 @@ function initMap() {
             map.setCenter(pos);
         })
         .then(getPubs)
-        .then(getRoute);
+        .then(getRoute)
+        .then(displayRoute);
 }
 
 function getUserLocation() {
@@ -57,11 +58,9 @@ function getPubs() {
 }
 
 function getRoute(pubs) {
-
     const waypoints = pubs.map(p => {
         return { stopover: true, location: p.geometry.location };
-    })
-    console.info(pubs, waypoints);
+    });
     service = new google.maps.DirectionsService();
     return new Promise((resolve, reject) => {
         service.route({
@@ -78,5 +77,14 @@ function getRoute(pubs) {
                 reject();
             }
         });
-    })
+    });
+}
+
+function displayRoute(route) {
+    var directionsDisplay = new google.maps.DirectionsRenderer({
+        draggable: true,
+        map: map,
+        panel: document.getElementById('right-panel')
+    });
+    directionsDisplay.setDirections(route);
 }
