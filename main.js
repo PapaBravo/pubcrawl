@@ -1,3 +1,13 @@
+const fireBaseConfig = {
+    apiKey: "AIzaSyBn2HRMBMxB2TNvY1rb_qqlkCFyCZeZ8no",
+    authDomain: "pubcrawl-e482b.firebaseapp.com",
+    databaseURL: "https://pubcrawl-e482b.firebaseio.com",
+    projectId: "pubcrawl-e482b",
+    storageBucket: "",
+    messagingSenderId: "1011766290274"
+};
+firebase.initializeApp(fireBaseConfig);
+const database = firebase.database();
 let map;
 let userPos;
 let directionsDisplay;
@@ -6,6 +16,19 @@ function init() {
     initMap();
     initDirectionsRenderer();
     initAutocomplete();
+    testFirebase();
+}
+
+function testFirebase(params) {
+
+    // firebase.database().ref('/lastAccessed').once('value')
+    //     .then(snapshot => console.info(snapshot && snapshot.val()));
+
+    const data = new Date().toISOString();
+    database.ref('/lastAccessed').set(data)
+        .then(err => {
+            if (err) console.error('Writing lastAccessed failed', err)
+        });
 }
 
 // this gets called by maps load callback
@@ -171,3 +194,24 @@ function getCoordinatesForLocation(origin) {
     });
 }
 
+var $star_rating = $('.star-rating .fa');
+
+var SetRatingStar = function() {
+  return $star_rating.each(function() {
+    if (parseInt($star_rating.siblings('input.rating-value').val()) >= parseInt($(this).data('rating'))) {
+      return $(this).removeClass('fa-star-o').addClass('fa-star');
+    } else {
+      return $(this).removeClass('fa-star').addClass('fa-star-o');
+    }
+  });
+};
+
+$star_rating.on('click', function() {
+  $star_rating.siblings('input.rating-value').val($(this).data('rating'));
+  return SetRatingStar();
+});
+
+SetRatingStar();
+$(document).ready(function() {
+
+});
