@@ -54,23 +54,34 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="origin">Standort eingeben</label>
-                        <input id="origin" placeholder="Adresse eingeben" onFocus="geolocate()" type="text" class="form-control"></input>
+                        <label for="origin">Standort eingeben: </label>
+                        <input id="origin" placeholder="Adresse" type="text" class="form-control" onblur="showLocation(this.value)"></input>
                     </div>
                     <div class="form-group">
-                        <label for="radius">Standort eingeben</label>
-                        <input id="radius" type="text" placeholder="Suchradius" class="form-control">
+                        <label for="radius">Suchradius:</label><span id="originValue"> 1000</span><span> m</span>
+                        <input type="range" min="500" max="10000" value="1000" class="slider" id="radius" onchange="updateSlider(this.value, 'originValue')">
                     </div>
                     <div class="form-group">
-                        <label for="distance">Wegstrecke</label>
-                        <input id="distance" type="text" placeholder="Max. Wegstrecke" class="form-control">
+                        <label for="distance">Wegstrecke:</label><span id="distanceValue"> 1000</span><span> m</span>
+                        <input type="range" min="500" max="5000" value="1000" class="slider" id="distance" onchange="updateSlider(this.value, 'distanceValue')">
                     </div>
                     <div class="form-group">
-                        <label for="price">Preiskategorie</label>
-                        <input type="range" min="0" max="4" value="3" class="slider" id="price">
+                        <label for="price">Preiskategorie wählen:</label><span id="priceValue"> 3</span>
+                        <input type="range" min="0" max="4" value="3" class="slider" id="price" onchange="updateSlider(this.value, 'priceValue')">
+                    </div>
+
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="persons">Anzahl Personen:</label><span id="personsValue"> 5</span>
+                        <input type="range" min="1" max="15" value="5" class="slider" id="persons" onchange="updateSlider(this.value, 'personsValue')">
                     </div>
                     <div class="form-group">
-                        <label>Bewertung</label>
+                        <label for="bars">Anzahl Bars:</label><span id="barsValue"> 5</span>
+                        <input type="range" min="2" max="8" value="5" class="slider" id="bars" onchange="updateSlider(this.value, 'barsValue')">
+                    </div>
+                    <div class="form-group">
+                        <label>Nur Bars mit einer Bewertung von mindestens...</label>
                         <div class="star-rating">
                             <span class="fa fa-star-o" data-rating="1"></span>
                             <span class="fa fa-star-o" data-rating="2"></span>
@@ -79,24 +90,7 @@
                             <span class="fa fa-star-o" data-rating="5"></span>
                             <input type="hidden" class="rating-value" value="4.0">
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="range">Suchradius</label>
-                        <input type="range" min="500" max="10000" value="1000" class="slider" id="range">
-                    </div>
-                    <div class="form-group">
-                        <label for="distance">Wegstrecke</label>
-                        <input type="range" min="500" max="5000" value="1000" class="slider" id="distance">
-                    </div>
-                    <div class="form-group">
-                        <label for="persons">Anzahl Personen</label>
-                        <input type="range" min="1" max="15" value="5" class="slider" id="persons">
-                    </div>
-                    <div class="form-group">
-                        <label for="bars">Anzahl Bars</label>
-                        <input type="range" min="2" max="8" value="5" class="slider" id="bars">
+                        <label>einbeziehen.</label>
                     </div>
                 </div>
                 <div class="col-md-4">

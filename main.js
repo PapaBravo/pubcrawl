@@ -215,3 +215,14 @@ SetRatingStar();
 $(document).ready(function() {
 
 });
+
+function updateSlider(slideAmount, slider) {
+    var sliderDiv = document.getElementById(slider);
+    sliderDiv.innerHTML = " " + slideAmount;
+}
+
+function showLocation(location) {
+    getCoordinatesForLocation(location).then(result => {
+        map.setCenter(result);
+    });
+}
