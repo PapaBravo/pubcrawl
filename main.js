@@ -1,22 +1,45 @@
+const fireBaseConfig = {
+    apiKey: "AIzaSyBn2HRMBMxB2TNvY1rb_qqlkCFyCZeZ8no",
+    authDomain: "pubcrawl-e482b.firebaseapp.com",
+    databaseURL: "https://pubcrawl-e482b.firebaseio.com",
+    projectId: "pubcrawl-e482b",
+    storageBucket: "",
+    messagingSenderId: "1011766290274"
+};
+firebase.initializeApp(fireBaseConfig);
+const database = firebase.database();
 let map;
 let userPos;
 
 function init() {
     initMap();
     initAutocomplete();
+    testFirebase();
+}
+
+function testFirebase(params) {
+
+    // firebase.database().ref('/lastAccessed').once('value')
+    //     .then(snapshot => console.info(snapshot && snapshot.val()));
+
+    const data = new Date().toISOString();
+    database.ref('/lastAccessed').set(data)
+        .then(err => {
+            if (err) console.error('Writing lastAccessed failed', err)
+        });
 }
 
 // this gets called by maps load callback
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
+        // center: { lat: -34.397, lng: 150.644 },
         zoom: 8
     });
     getUserLocation()
         .then(pos => {
             userPos = pos;
             map.setCenter(pos);
-            showRoute({origin: pos, radius: 1000});
+            showRoute({ origin: pos, radius: 1000 });
         });
 }
 
@@ -100,7 +123,7 @@ function getRoute({ pubs, options }) {
  * 
  * @param {*} route 
  */
-function displayRoute({route, options}) {
+function displayRoute({ route, options }) {
     var directionsDisplay = new google.maps.DirectionsRenderer({
         draggable: true,
         map: map,
@@ -134,7 +157,6 @@ function geolocate() {
         })
     }
 }
-
 
 function showRoute(params = {}) {
     const options = {};
