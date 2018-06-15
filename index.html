@@ -52,14 +52,16 @@
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="autocomplete">Standort eingeben</label>
-                        <input id="autocomplete" placeholder="Adresse eingeben" onFocus="geolocate()" type="text" class="form-control"></input>
+                        <label for="origin">Standort eingeben</label>
+                        <input id="origin" placeholder="Adresse eingeben" onFocus="geolocate()" type="text" class="form-control"></input>
                     </div>
                     <div class="form-group">
-                        <input type="text" placeholder="Suchradius" class="form-control">
+                        <label for="radius">Standort eingeben</label>
+                        <input id="radius" type="text" placeholder="Suchradius" class="form-control">
                     </div>
                     <div class="form-group">
-                        <input type="text" placeholder="Max. Wegstrecke" class="form-control">
+                        <label for="distance">Wegstrecke</label>
+                        <input id="distance" type="text" placeholder="Max. Wegstrecke" class="form-control">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -68,7 +70,7 @@
                         ut fermentum massa justo sit amet risus.</p>
                 </div>
                 <div class="col-md-4">
-                    <button type="button" class="btn btn-primary">Los geht's!</button>
+                    <button type="button" onclick="showRouteButtonClicked()" class="btn btn-primary">Los geht's!</button>
                 </div>
             </div>
         </div>

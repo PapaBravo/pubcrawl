@@ -1,8 +1,10 @@
 let map;
 let userPos;
+let directionsDisplay;
 
 function init() {
     initMap();
+    initDirectionsRenderer();
     initAutocomplete();
 }
 
@@ -12,12 +14,19 @@ function initMap() {
         center: { lat: -34.397, lng: 150.644 },
         zoom: 8
     });
-    getUserLocation()
-        .then(pos => {
-            userPos = pos;
-            map.setCenter(pos);
-            showRoute({origin: pos, radius: 1000});
-        });
+    // getUserLocation()
+    //     .then(pos => {
+    //         userPos = pos;
+    //         map.setCenter(pos);
+    //     });
+}
+
+function initDirectionsRenderer() {
+    directionsDisplay = new google.maps.DirectionsRenderer({
+        draggable: true,
+        map: map,
+        panel: document.getElementById('right-panel')
+    });
 }
 
 /**
@@ -101,21 +110,16 @@ function getRoute({ pubs, options }) {
  * @param {*} route 
  */
 function displayRoute({route, options}) {
-    var directionsDisplay = new google.maps.DirectionsRenderer({
-        draggable: true,
-        map: map,
-        panel: document.getElementById('right-panel')
-    });
     directionsDisplay.setDirections(route);
 }
 
-var placeSearch, autocomplete
+var placeSearch, origin;
 
 function initAutocomplete() {
     // Create the autocomplete object, restricting the search to geographical
     // location types.
-    autocomplete = new google.maps.places.Autocomplete(
-    /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
+    origin = new google.maps.places.Autocomplete(
+    /** @type {!HTMLInputElement} */(document.getElementById('origin')),
         { types: ['geocode'] })
 }
 
@@ -130,18 +134,40 @@ function geolocate() {
                 center: geolocation,
                 radius: position.coords.accuracy
             })
-            autocomplete.setBounds(circle.getBounds())
+            origin.setBounds(circle.getBounds())
         })
     }
 }
-
 
 function showRoute(params = {}) {
     const options = {};
     options.origin = params.origin || { lat: -34.397, lng: 150.644 };
     options.radius = params.radius || 1000;
+    options.distance = params.distance || 1000;
 
     return getPubs(options)
         .then(getRoute)
         .then(displayRoute);
 }
+
+function showRouteButtonClicked() {
+    var origin = document.getElementById("origin").value;
+    var radius = document.getElementById("radius").value;
+    var distance = document.getElementById("distance").value;
+
+    getCoordinatesForLocation(origin).then(result => {
+        showRoute({origin: result, radius: radius, distance: distance});
+    });
+}
+
+function getCoordinatesForLocation(origin) {
+    return new Promise((resolve, reject) => {
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({
+            "address": origin
+        }, function(results) {
+            resolve(results[0].geometry.location);
+        });
+    });
+}
+
