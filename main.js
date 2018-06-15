@@ -8,13 +8,25 @@ const fireBaseConfig = {
 };
 firebase.initializeApp(fireBaseConfig);
 const database = firebase.database();
-
 let map;
 let userPos;
 
 function init() {
     initMap();
     initAutocomplete();
+    testFirebase();
+}
+
+function testFirebase(params) {
+
+    // firebase.database().ref('/lastAccessed').once('value')
+    //     .then(snapshot => console.info(snapshot && snapshot.val()));
+
+    const data = new Date().toISOString();
+    database.ref('/lastAccessed').set(data)
+        .then(err => {
+            if (err) console.error('Writing lastAccessed failed', err)
+        });
 }
 
 // this gets called by maps load callback
@@ -27,10 +39,8 @@ function initMap() {
         .then(pos => {
             userPos = pos;
             map.setCenter(pos);
-        })
-        .then(getPubs)
-        .then(getRoute)
-        .then(displayRoute);
+            showRoute({ origin: pos, radius: 1000 });
+        });
 }
 
 /**
@@ -57,12 +67,12 @@ function getUserLocation() {
 /**
  * @returns Promise
  */
-function getPubs() {
+function getPubs(options) {
     const request = {
         query: '',
         fields: ['name', 'rating', 'opening_hours', 'formatted_address', 'geometry'],
-        location: userPos,
-        radius: 1000,
+        location: options.origin,
+        radius: options.radius,
         type: 'bar',
         openNow: true
     }
@@ -72,7 +82,7 @@ function getPubs() {
     return new Promise((resolve, reject) => {
         service.nearbySearch(request, (results, status) => {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
-                resolve(results.slice(0, 5));
+                resolve({ pubs: results.slice(0, 5), options });
             } else {
                 console.warn('PlaceService Error', status, results);
                 reject();
@@ -83,26 +93,26 @@ function getPubs() {
 
 /**
  * 
- * @param {*} pubs
+ * @param {*}
  * @returns Promise 
  */
-function getRoute(pubs) {
+function getRoute({ pubs, options }) {
     const waypoints = pubs.map(p => {
         return { stopover: true, location: p.geometry.location };
     });
     service = new google.maps.DirectionsService();
     return new Promise((resolve, reject) => {
         service.route({
-            origin: userPos,
-            destination: userPos,
+            origin: options.origin,
+            destination: options.origin,
             waypoints: waypoints,
             travelMode: 'WALKING',
             optimizeWaypoints: true
-        }, (result, status) => {
+        }, (route, status) => {
             if (status === 'OK') {
-                resolve(result);
+                resolve({ route, options });
             } else {
-                console.warn('Route error', status, results);
+                console.warn('Route error', status, route);
                 reject();
             }
         });
@@ -113,8 +123,8 @@ function getRoute(pubs) {
  * 
  * @param {*} route 
  */
-function displayRoute(route) {
-    const directionsDisplay = new google.maps.DirectionsRenderer({
+function displayRoute({ route, options }) {
+    var directionsDisplay = new google.maps.DirectionsRenderer({
         draggable: true,
         map: map,
         panel: document.getElementById('right-panel')
@@ -124,26 +134,36 @@ function displayRoute(route) {
 
 var placeSearch, autocomplete
 
-function initAutocomplete () {
-  // Create the autocomplete object, restricting the search to geographical
-  // location types.
-  autocomplete = new google.maps.places.Autocomplete(
+function initAutocomplete() {
+    // Create the autocomplete object, restricting the search to geographical
+    // location types.
+    autocomplete = new google.maps.places.Autocomplete(
     /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
-    {types: ['geocode']})
+        { types: ['geocode'] })
 }
 
-function geolocate () {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function (position) {
-      var geolocation = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      }
-      var circle = new google.maps.Circle({
-        center: geolocation,
-        radius: position.coords.accuracy
-      })
-      autocomplete.setBounds(circle.getBounds())
-    })
-  }
+function geolocate() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            var geolocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            }
+            var circle = new google.maps.Circle({
+                center: geolocation,
+                radius: position.coords.accuracy
+            })
+            autocomplete.setBounds(circle.getBounds())
+        })
+    }
+}
+
+function showRoute(params = {}) {
+    const options = {};
+    options.origin = params.origin || { lat: -34.397, lng: 150.644 };
+    options.radius = params.radius || 1000;
+
+    return getPubs(options)
+        .then(getRoute)
+        .then(displayRoute);
 }
