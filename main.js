@@ -1,10 +1,21 @@
+const fireBaseConfig = {
+    apiKey: "AIzaSyBn2HRMBMxB2TNvY1rb_qqlkCFyCZeZ8no",
+    authDomain: "pubcrawl-e482b.firebaseapp.com",
+    databaseURL: "https://pubcrawl-e482b.firebaseio.com",
+    projectId: "pubcrawl-e482b",
+    storageBucket: "",
+    messagingSenderId: "1011766290274"
+};
+firebase.initializeApp(fireBaseConfig);
+const database = firebase.database();
+
 let map;
 let userPos;
 
 // this gets called by maps load callback
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
+        // center: { lat: -34.397, lng: 150.644 },
         zoom: 8
     });
     getUserLocation()
@@ -98,7 +109,7 @@ function getRoute(pubs) {
  * @param {*} route 
  */
 function displayRoute(route) {
-    var directionsDisplay = new google.maps.DirectionsRenderer({
+    const directionsDisplay = new google.maps.DirectionsRenderer({
         draggable: true,
         map: map,
         panel: document.getElementById('right-panel')
