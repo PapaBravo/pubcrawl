@@ -1,5 +1,7 @@
 let map;
 let userPos;
+
+// this gets called by maps load callback
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: -34.397, lng: 150.644 },
@@ -15,6 +17,9 @@ function initMap() {
         .then(displayRoute);
 }
 
+/**
+ * @returns Promise
+ */
 function getUserLocation() {
     return new Promise((resolve, reject) => {
         if (navigator.geolocation) {
@@ -33,6 +38,9 @@ function getUserLocation() {
     });
 }
 
+/**
+ * @returns Promise
+ */
 function getPubs() {
     const request = {
         query: '',
@@ -57,6 +65,11 @@ function getPubs() {
     });
 }
 
+/**
+ * 
+ * @param {*} pubs
+ * @returns Promise 
+ */
 function getRoute(pubs) {
     const waypoints = pubs.map(p => {
         return { stopover: true, location: p.geometry.location };
@@ -80,6 +93,10 @@ function getRoute(pubs) {
     });
 }
 
+/**
+ * 
+ * @param {*} route 
+ */
 function displayRoute(route) {
     var directionsDisplay = new google.maps.DirectionsRenderer({
         draggable: true,
