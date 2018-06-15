@@ -1,8 +1,7 @@
-html,
-body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -12,13 +11,19 @@ body {
 
 #map {
   height: 100%;
-  }
+}
 
-  .star-rating {
-    line-height:32px;
-    font-size:2em;
-  }
-  
-  .star-rating .fa-star{
-    color: #dab979;
-  }
+.star-rating {
+  line-height: 32px;
+  font-size: 2em;
+}
+
+.star-rating .fa-star {
+  color: #dab979;
+}
+
+.jumbotron {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}

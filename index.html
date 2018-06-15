@@ -11,7 +11,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>    
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
 </head>
 
 <body>
@@ -58,26 +58,33 @@
                         <input id="origin" placeholder="Adresse" type="text" class="form-control" onblur="showLocation(this.value)"></input>
                     </div>
                     <div class="form-group">
-                        <label for="radius">Suchradius:</label><span id="originValue"> 1000</span><span> m</span>
+                        <label for="radius">Suchradius:</label>
+                        <span id="originValue"> 1000</span>
+                        <span> m</span>
                         <input type="range" min="500" max="10000" value="1000" class="slider" id="radius" onchange="updateSlider(this.value, 'originValue')">
                     </div>
                     <div class="form-group">
-                        <label for="distance">Wegstrecke:</label><span id="distanceValue"> 1000</span><span> m</span>
+                        <label for="distance">Wegstrecke:</label>
+                        <span id="distanceValue"> 1000</span>
+                        <span> m</span>
                         <input type="range" min="500" max="5000" value="1000" class="slider" id="distance" onchange="updateSlider(this.value, 'distanceValue')">
                     </div>
                     <div class="form-group">
-                        <label for="price">Preiskategorie wählen:</label><span id="priceValue"> 3</span>
+                        <label for="price">Preiskategorie wählen:</label>
+                        <span id="priceValue"> 3</span>
                         <input type="range" min="0" max="4" value="3" class="slider" id="price" onchange="updateSlider(this.value, 'priceValue')">
                     </div>
 
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="persons">Anzahl Personen:</label><span id="personsValue"> 5</span>
+                        <label for="persons">Anzahl Personen:</label>
+                        <span id="personsValue"> 5</span>
                         <input type="range" min="1" max="15" value="5" class="slider" id="persons" onchange="updateSlider(this.value, 'personsValue')">
                     </div>
                     <div class="form-group">
-                        <label for="bars">Anzahl Bars:</label><span id="barsValue"> 5</span>
+                        <label for="bars">Anzahl Bars:</label>
+                        <span id="barsValue"> 5</span>
                         <input type="range" min="2" max="8" value="5" class="slider" id="bars" onchange="updateSlider(this.value, 'barsValue')">
                     </div>
                     <div class="form-group">

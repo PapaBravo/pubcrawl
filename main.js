@@ -34,8 +34,8 @@ function testFirebase(params) {
 // this gets called by maps load callback
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: -34.397, lng: 150.644 },
-        zoom: 8
+        center: { lat: 53.549531, lng: 9.964336 },
+        zoom: 12
     });
     // getUserLocation()
     //     .then(pos => {
@@ -132,7 +132,7 @@ function getRoute({ pubs, options }) {
  * 
  * @param {*} route 
  */
-function displayRoute({route, options}) {
+function displayRoute({ route, options }) {
     directionsDisplay.setDirections(route);
 }
 
@@ -179,7 +179,7 @@ function showRouteButtonClicked() {
     var distance = document.getElementById("distance").value;
 
     getCoordinatesForLocation(origin).then(result => {
-        showRoute({origin: result, radius: radius, distance: distance});
+        showRoute({ origin: result, radius: radius, distance: distance });
     });
 }
 
@@ -188,7 +188,7 @@ function getCoordinatesForLocation(origin) {
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({
             "address": origin
-        }, function(results) {
+        }, function (results) {
             resolve(results[0].geometry.location);
         });
     });
@@ -196,23 +196,23 @@ function getCoordinatesForLocation(origin) {
 
 var $star_rating = $('.star-rating .fa');
 
-var SetRatingStar = function() {
-  return $star_rating.each(function() {
-    if (parseInt($star_rating.siblings('input.rating-value').val()) >= parseInt($(this).data('rating'))) {
-      return $(this).removeClass('fa-star-o').addClass('fa-star');
-    } else {
-      return $(this).removeClass('fa-star').addClass('fa-star-o');
-    }
-  });
+var SetRatingStar = function () {
+    return $star_rating.each(function () {
+        if (parseInt($star_rating.siblings('input.rating-value').val()) >= parseInt($(this).data('rating'))) {
+            return $(this).removeClass('fa-star-o').addClass('fa-star');
+        } else {
+            return $(this).removeClass('fa-star').addClass('fa-star-o');
+        }
+    });
 };
 
-$star_rating.on('click', function() {
-  $star_rating.siblings('input.rating-value').val($(this).data('rating'));
-  return SetRatingStar();
+$star_rating.on('click', function () {
+    $star_rating.siblings('input.rating-value').val($(this).data('rating'));
+    return SetRatingStar();
 });
 
 SetRatingStar();
-$(document).ready(function() {
+$(document).ready(function () {
 
 });
 
