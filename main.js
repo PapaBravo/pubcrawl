@@ -12,6 +12,11 @@ const database = firebase.database();
 let map;
 let userPos;
 
+function init() {
+    initMap();
+    initAutocomplete();
+}
+
 // this gets called by maps load callback
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -115,4 +120,30 @@ function displayRoute(route) {
         panel: document.getElementById('right-panel')
     });
     directionsDisplay.setDirections(route);
+}
+
+var placeSearch, autocomplete
+
+function initAutocomplete () {
+  // Create the autocomplete object, restricting the search to geographical
+  // location types.
+  autocomplete = new google.maps.places.Autocomplete(
+    /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
+    {types: ['geocode']})
+}
+
+function geolocate () {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      var geolocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      }
+      var circle = new google.maps.Circle({
+        center: geolocation,
+        radius: position.coords.accuracy
+      })
+      autocomplete.setBounds(circle.getBounds())
+    })
+  }
 }
