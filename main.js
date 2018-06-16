@@ -18,13 +18,62 @@ const crawlsRef = database.ref('crawls/');
 let map;
 let userPos;
 let directionsDisplay;
+let placeSearch;
+let origin;
+let geocoder;
+let marker;
+let markers = [];
+let bounds;
+let pubs;
+let circles = [];
+let circle;
+let $star_rating = $('.star-rating .fa');
 
 function init() {
+    initPosition();
     initMap();
     initDirectionsRenderer();
     initAutocomplete();
     testFirebase();
     // loadCrawl();
+}
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: defaultPosition.lat, lng: defaultPosition.lng },
+        zoom: 12,
+        minZoom: 4,
+        maxZoom: 15
+    });
+}
+
+function initPosition() {
+    getUserLocation()
+        .then(pos => {
+            userPos = pos;
+            map.setCenter(pos);
+            getLocationForCoordinates(pos).then(result => {
+                document.getElementById('origin').value = result;
+            });
+            setMarker(pos, "Standort");
+            clearCircle();
+            setCircle(document.getElementById('radius').value);
+            fitZoom();
+    });
+}
+
+function initAutocomplete() {
+    origin = new google.maps.places.Autocomplete(
+    /** @type {!HTMLInputElement} */(document.getElementById('origin')),
+        { types: ['geocode'] })
+}
+
+function initDirectionsRenderer() {
+    directionsDisplay = new google.maps.DirectionsRenderer({
+        draggable: true,
+        map: map,
+        panel: document.getElementById('right-panel')
+    });
 }
 
 function testFirebase(params) {
@@ -50,25 +99,52 @@ function loadCrawl(crawlId) {
         });
 }
 
-// this gets called by maps load callback
-function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: defaultPosition.lat, lng: defaultPosition.lng },
-        zoom: 12
-    });
-    // getUserLocation()
-    //     .then(pos => {
-    //         userPos = pos;
-    //         map.setCenter(pos);
-    //     });
+function setMarker(position, title) {
+    markers.push(
+        marker = new google.maps.Marker({
+            position: position,
+            map: map,
+            title: title
+        })
+    );
 }
 
-function initDirectionsRenderer() {
-    directionsDisplay = new google.maps.DirectionsRenderer({
-        draggable: true,
-        map: map,
-        panel: document.getElementById('right-panel')
+function setCircle(radius) {
+    circles.push(
+        circle = new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.35,
+            map: map,
+            center: userPos,
+            radius: Number(radius)
+            })
+    );
+}
+
+function clearMarkers() {
+    markers.forEach(function(marker) {
+        marker.setMap(null);
     });
+    markers = [];
+}
+
+function clearCircle() {
+    circles.forEach(function(circle) {
+        circle.setMap(null);
+    });
+    circles = [];
+}
+
+function fitZoom() {
+    bounds = new google.maps.LatLngBounds();
+    for (var i = 0; i < markers.length; i++) {
+        bounds.extend(markers[i].getPosition());
+    }
+    bounds.union(circle.getBounds());
+    map.fitBounds(bounds);
 }
 
 /**
@@ -188,33 +264,19 @@ function getRoute({ pubs, options }) {
  */
 function displayRoute({ route, options }) {
     directionsDisplay.setDirections(route);
+    clearMarkers();
+    fitZoom();
     return Promise.resolve({ route, options });
 }
 
-var placeSearch, origin;
-
-function initAutocomplete() {
-    // Create the autocomplete object, restricting the search to geographical
-    // location types.
-    origin = new google.maps.places.Autocomplete(
-    /** @type {!HTMLInputElement} */(document.getElementById('origin')),
-        { types: ['geocode'] })
-}
-
-function geolocate() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function (position) {
-            var geolocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-            }
-            var circle = new google.maps.Circle({
-                center: geolocation,
-                radius: position.coords.accuracy
-            })
-            origin.setBounds(circle.getBounds())
-        })
-    }
+function geolocate(origin) {
+    console.log(origin);
+    getCoordinatesForLocation(origin).then(result => {
+        userPos = result;
+        clearMarkers();
+        setMarker(result, "Standort");
+        map.setCenter(result);
+    });
 }
 
 function showRoute(params = {}) {
@@ -227,6 +289,7 @@ function showRoute(params = {}) {
     options.rating = params.rating || 4;
 
     return getPubs(options)
+        .then(result => pubs = result)
         .then(getRoute)
         .then(displayRoute)
         .then(saveCrawl);
@@ -258,7 +321,7 @@ function showRouteButtonClicked() {
 
 function getCoordinatesForLocation(origin) {
     return new Promise((resolve, reject) => {
-        var geocoder = new google.maps.Geocoder();
+        geocoder = new google.maps.Geocoder();
         geocoder.geocode({
             "address": origin
         }, function (results) {
@@ -267,7 +330,16 @@ function getCoordinatesForLocation(origin) {
     });
 }
 
-var $star_rating = $('.star-rating .fa');
+function getLocationForCoordinates(coordinates) {
+    return new Promise((resolve, reject) => {
+        geocoder = new google.maps.Geocoder();
+        geocoder.geocode({
+            "latLng": coordinates
+        }, function(results) {
+            resolve(results[0].formatted_address);
+        });
+    });
+}
 
 var SetRatingStar = function () {
     return $star_rating.each(function () {
@@ -296,10 +368,11 @@ function getStarRating() {
 function updateSlider(slideAmount, slider) {
     var sliderDiv = document.getElementById(slider);
     sliderDiv.innerHTML = " " + slideAmount;
+
+    if (slider == "radiusValue") {
+        clearCircle();
+        setCircle(slideAmount);
+        fitZoom();
+    }
 }
 
-function showLocation(location) {
-    getCoordinatesForLocation(location).then(result => {
-        map.setCenter(result);
-    });
-}
