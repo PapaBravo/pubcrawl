@@ -6,6 +6,10 @@ const fireBaseConfig = {
     storageBucket: "",
     messagingSenderId: "1011766290274"
 };
+const defaultPosition = {
+    lat: 53.549531,
+    lng: 9.964336
+}
 firebase.initializeApp(fireBaseConfig);
 const database = firebase.database();
 let map;
@@ -34,7 +38,7 @@ function testFirebase(params) {
 // this gets called by maps load callback
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: 53.549531, lng: 9.964336 },
+        center: { lat: defaultPosition.lat, lng: defaultPosition.lng },
         zoom: 12
     });
     // getUserLocation()
@@ -68,7 +72,7 @@ function getUserLocation() {
             }, reject);
         } else {
             console.warn("Geolocation doesn't work", err)
-            resolve({ lat: 53.30, lng: 10.0 });
+            resolve({ lat: defaultPosition.lat, lng: defaultPosition.lng });
         }
     });
 }
@@ -164,7 +168,7 @@ function geolocate() {
 
 function showRoute(params = {}) {
     const options = {};
-    options.origin = params.origin || { lat: -34.397, lng: 150.644 };
+    options.origin = params.origin || { lat: defaultPosition.lat, lng: defaultPosition.lng };
     options.radius = params.radius || 1000;
     options.distance = params.distance || 1000;
 
