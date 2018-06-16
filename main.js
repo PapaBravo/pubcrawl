@@ -283,7 +283,6 @@ function showRoute(params = {}) {
     const options = {};
     options.origin = params.origin || { lat: defaultPosition.lat, lng: defaultPosition.lng };
     options.radius = params.radius || 1000;
-    options.distance = params.distance || 1000;
     options.maxPrice = params.maxPrice || 3;
     options.barCount = params.barCount || 5;
     options.rating = params.rating || 4;
@@ -302,7 +301,6 @@ function saveCrawl({ route, options }) {
 function showRouteButtonClicked() {
     var origin = document.getElementById("origin").value;
     var radius = document.getElementById("radius").value;
-    var distance = document.getElementById("distance").value;
     var maxPrice = document.getElementById("price").value;
     var barCount = document.getElementById("bars").value;
     var rating = getStarRating();
@@ -311,7 +309,6 @@ function showRouteButtonClicked() {
         showRoute({
             origin: result,
             radius: radius,
-            distance: distance,
             maxPrice: maxPrice,
             barCount: barCount,
             rating: rating
