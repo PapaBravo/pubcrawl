@@ -174,6 +174,7 @@ function showRoute(params = {}) {
     options.distance = params.distance || 1000;
     options.maxPrice = params.maxPrice || 3;
     options.barCount = params.barCount || 5;
+    options.rating = params.rating || 4;
 
     return getPubs(options)
         .then(getRoute)
@@ -186,9 +187,17 @@ function showRouteButtonClicked() {
     var distance = document.getElementById("distance").value;
     var maxPrice = document.getElementById("price").value;
     var barCount = document.getElementById("bars").value;
+    var rating = getStarRating();
 
     getCoordinatesForLocation(origin).then(result => {
-        showRoute({ origin: result, radius: radius, distance: distance, maxPrice: maxPrice, barCount: barCount });
+        showRoute({
+            origin: result,
+            radius: radius,
+            distance: distance,
+            maxPrice: maxPrice,
+            barCount: barCount,
+            rating: rating
+        });
     });
 }
 
@@ -224,6 +233,10 @@ SetRatingStar();
 $(document).ready(function () {
 
 });
+
+function getStarRating() {
+    return parseInt($star_rating.siblings('input.rating-value').val());
+}
 
 function updateSlider(slideAmount, slider) {
     var sliderDiv = document.getElementById(slider);
