@@ -6,6 +6,10 @@ const fireBaseConfig = {
     storageBucket: "",
     messagingSenderId: "1011766290274"
 };
+const defaultPosition = {
+    lat: 53.549531,
+    lng: 9.964336
+}
 firebase.initializeApp(fireBaseConfig);
 
 const database = firebase.database();
@@ -49,7 +53,7 @@ function loadCrawl(crawlId) {
 // this gets called by maps load callback
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: 53.549531, lng: 9.964336 },
+        center: { lat: defaultPosition.lat, lng: defaultPosition.lng },
         zoom: 12
     });
     // getUserLocation()
@@ -83,7 +87,7 @@ function getUserLocation() {
             }, reject);
         } else {
             console.warn("Geolocation doesn't work", err)
-            resolve({ lat: 53.30, lng: 10.0 });
+            resolve({ lat: defaultPosition.lat, lng: defaultPosition.lng });
         }
     });
 }
@@ -97,6 +101,7 @@ function getPubs(options) {
         fields: ['name', 'rating', 'opening_hours', 'formatted_address', 'geometry'],
         location: options.origin,
         radius: options.radius,
+        maxPrice: options.maxPrice,
         type: 'bar',
         openNow: true
     }
@@ -106,7 +111,7 @@ function getPubs(options) {
     return new Promise((resolve, reject) => {
         service.nearbySearch(request, (results, status) => {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
-                resolve({ pubs: results.slice(0, 5), options });
+                resolve({ pubs: results.slice(0, options.barCount - 1), options });
             } else {
                 console.warn('PlaceService Error', status, results);
                 reject();
@@ -214,9 +219,12 @@ function geolocate() {
 
 function showRoute(params = {}) {
     const options = {};
-    options.origin = params.origin || { lat: -34.397, lng: 150.644 };
+    options.origin = params.origin || { lat: defaultPosition.lat, lng: defaultPosition.lng };
     options.radius = params.radius || 1000;
     options.distance = params.distance || 1000;
+    options.maxPrice = params.maxPrice || 3;
+    options.barCount = params.barCount || 5;
+    options.rating = params.rating || 4;
 
     return getPubs(options)
         .then(getRoute)
@@ -232,9 +240,19 @@ function showRouteButtonClicked() {
     var origin = document.getElementById("origin").value;
     var radius = document.getElementById("radius").value;
     var distance = document.getElementById("distance").value;
+    var maxPrice = document.getElementById("price").value;
+    var barCount = document.getElementById("bars").value;
+    var rating = getStarRating();
 
     getCoordinatesForLocation(origin).then(result => {
-        showRoute({ origin: result, radius: radius, distance: distance });
+        showRoute({
+            origin: result,
+            radius: radius,
+            distance: distance,
+            maxPrice: maxPrice,
+            barCount: barCount,
+            rating: rating
+        });
     });
 }
 
@@ -270,6 +288,10 @@ SetRatingStar();
 $(document).ready(function () {
 
 });
+
+function getStarRating() {
+    return parseInt($star_rating.siblings('input.rating-value').val());
+}
 
 function updateSlider(slideAmount, slider) {
     var sliderDiv = document.getElementById(slider);
