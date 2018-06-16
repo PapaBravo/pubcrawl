@@ -7,7 +7,10 @@ const fireBaseConfig = {
     messagingSenderId: "1011766290274"
 };
 firebase.initializeApp(fireBaseConfig);
+
 const database = firebase.database();
+const crawlsRef = database.ref('crawls/');
+
 let map;
 let userPos;
 let directionsDisplay;
@@ -17,6 +20,7 @@ function init() {
     initDirectionsRenderer();
     initAutocomplete();
     testFirebase();
+    // loadCrawl();
 }
 
 function testFirebase(params) {
@@ -28,6 +32,17 @@ function testFirebase(params) {
     database.ref('/lastAccessed').set(data)
         .then(err => {
             if (err) console.error('Writing lastAccessed failed', err)
+        });
+}
+
+function loadCrawl(crawlId) {
+    // TODO use id
+    let crawlRef = crawlsRef.limitToLast(1).once('value')
+        .then(snapshot => {
+            if (snapshot) {
+                const lastCrawl = Object.values(snapshot.val())[0];
+                displayRoute({route: lastCrawl, options: {}});
+            }
         });
 }
 
@@ -102,6 +117,40 @@ function getPubs(options) {
 
 /**
  * 
+ * @param {google.maps.DirectionsResult} directionsResult
+ */
+function getJSONDirectionResult(directionsResult) {
+    const jsonResult = {
+        geocoded_waypoints: directionsResult.geocoded_waypoints,
+        routes: directionsResult.routes,
+        request: {
+            travelMode: directionsResult.request.travelMode
+        }
+    }
+    jsonResult.routes[0].bounds = jsonResult.routes[0].bounds.toJSON();
+    jsonResult.routes[0].legs = jsonResult.routes[0].legs.map(leg => {
+        const jsonLeg = leg;
+        jsonLeg.end_location = jsonLeg.end_location.toJSON();
+        jsonLeg.start_location = jsonLeg.start_location.toJSON();
+        jsonLeg.steps = jsonLeg.steps.map(step => {
+            const jsonStep = step;
+            jsonStep.end_location = jsonStep.end_location.toJSON();
+            jsonStep.start_location = jsonStep.start_location.toJSON();
+            jsonStep.start_point = jsonStep.start_point.toJSON();
+            jsonStep.end_point = jsonStep.end_point.toJSON();
+            jsonStep.path = jsonStep.path.map(loc => loc.toJSON());
+            jsonStep.lat_lngs = jsonStep.lat_lngs.map(loc => loc.toJSON());
+            return jsonStep;
+        });        
+        return jsonLeg;
+    });
+    jsonResult.routes[0].overview_path = jsonResult.routes[0].overview_path.map(loc => loc.toJSON());
+    console.info(jsonResult)    
+    return jsonResult;
+}
+
+/**
+ * 
  * @param {*}
  * @returns Promise 
  */
@@ -117,11 +166,11 @@ function getRoute({ pubs, options }) {
             waypoints: waypoints,
             travelMode: 'WALKING',
             optimizeWaypoints: true
-        }, (route, status) => {
+        }, (result, status) => {
             if (status === 'OK') {
-                resolve({ route, options });
+                resolve({ route: getJSONDirectionResult(result), options });
             } else {
-                console.warn('Route error', status, route);
+                console.warn('Route error', status, result);
                 reject();
             }
         });
@@ -134,6 +183,7 @@ function getRoute({ pubs, options }) {
  */
 function displayRoute({ route, options }) {
     directionsDisplay.setDirections(route);
+    return Promise.resolve({ route, options });
 }
 
 var placeSearch, origin;
@@ -170,7 +220,12 @@ function showRoute(params = {}) {
 
     return getPubs(options)
         .then(getRoute)
-        .then(displayRoute);
+        .then(displayRoute)
+        .then(saveCrawl);
+}
+
+function saveCrawl({ route, options }) {
+    crawlsRef.push().set(route);
 }
 
 function showRouteButtonClicked() {
