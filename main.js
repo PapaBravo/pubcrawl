@@ -70,7 +70,7 @@ function initAutocomplete() {
 
 function initDirectionsRenderer() {
     directionsDisplay = new google.maps.DirectionsRenderer({
-        draggable: true,
+        draggable: false,
         map: map,
         panel: document.getElementById('right-panel')
     });
@@ -187,6 +187,7 @@ function getPubs(options) {
     return new Promise((resolve, reject) => {
         service.nearbySearch(request, (results, status) => {
             if (status == google.maps.places.PlacesServiceStatus.OK) {
+                console.log(results);
                 resolve({ pubs: results.slice(0, options.barCount - 1), options });
             } else {
                 console.warn('PlaceService Error', status, results);
@@ -288,14 +289,24 @@ function showRoute(params = {}) {
     options.rating = params.rating || 4;
 
     return getPubs(options)
-        .then(result => pubs = result)
         .then(getRoute)
         .then(displayRoute)
-        .then(saveCrawl);
+        .then(saveCrawl)
+        .then(savePubs);
 }
 
 function saveCrawl({ route, options }) {
     crawlsRef.push().set(route);
+}
+
+function savePubs() {
+    return new Promise(resolve => {
+        $('#pubsTable').bootstrapTable({
+            data: pubs
+        });
+    }, function (results) {
+        resolve(true);  
+    })
 }
 
 function showRouteButtonClicked() {

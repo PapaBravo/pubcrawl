@@ -8,6 +8,8 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
@@ -103,6 +105,14 @@
         <div class="col-md-3">
             <h2>Pubs</h2>
         </div>
+        <table id="pubsTable" data-height="460">
+            <thead>
+                <tr>
+                    <th data-field="vicinity">Name</th>
+                    <th data-field="rating">Bewertung</th>
+                </tr>
+            </thead>
+        </table>
     </div>
     <div class="container">
         <footer>
