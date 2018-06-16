@@ -4,14 +4,14 @@
 <head>
     <meta name="viewport" content="initial-scale=1.0">
     <meta charset="utf-8">
-    <title>PubCrawl</title>
+    <title>PubCrawler</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>    
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
 </head>
 
 <body>
@@ -48,36 +48,43 @@
             <!-- Example row of columns -->
             <div class="row">
                 <div class="col-md-12">
-                    <h2>Plane jetzt deine perfekte PubCrawl-Route!</h2>
+                    <h2>Plane jetzt deine perfekte PubCrawler-Route!</h2>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="origin">Standort eingeben: </label>
-                        <input id="origin" placeholder="Adresse" type="text" class="form-control" onblur="showLocation(this.value)"></input>
+                        <input id="origin" placeholder="Adresse" type="text" class="form-control" onblur="geolocate(this.value)"></input>
                     </div>
                     <div class="form-group">
-                        <label for="radius">Suchradius:</label><span id="originValue"> 1000</span><span> m</span>
-                        <input type="range" min="500" max="10000" value="1000" class="slider" id="radius" onchange="updateSlider(this.value, 'originValue')">
+                        <label for="radius">Suchradius:</label>
+                        <span id="radiusValue"> 1000</span>
+                        <span> m</span>
+                        <input type="range" min="500" max="10000" value="1000" class="slider" id="radius" onchange="updateSlider(this.value, 'radiusValue')">
                     </div>
                     <div class="form-group">
-                        <label for="distance">Wegstrecke:</label><span id="distanceValue"> 1000</span><span> m</span>
+                        <label for="distance">Wegstrecke:</label>
+                        <span id="distanceValue"> 1000</span>
+                        <span> m</span>
                         <input type="range" min="500" max="5000" value="1000" class="slider" id="distance" onchange="updateSlider(this.value, 'distanceValue')">
                     </div>
                     <div class="form-group">
-                        <label for="price">Preiskategorie wählen:</label><span id="priceValue"> 3</span>
+                        <label for="price">Preiskategorie wählen:</label>
+                        <span id="priceValue"> 3</span>
                         <input type="range" min="0" max="4" value="3" class="slider" id="price" onchange="updateSlider(this.value, 'priceValue')">
                     </div>
 
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="persons">Anzahl Personen:</label><span id="personsValue"> 5</span>
+                        <label for="persons">Anzahl Personen:</label>
+                        <span id="personsValue"> 5</span>
                         <input type="range" min="1" max="15" value="5" class="slider" id="persons" onchange="updateSlider(this.value, 'personsValue')">
                     </div>
                     <div class="form-group">
-                        <label for="bars">Anzahl Bars:</label><span id="barsValue"> 5</span>
+                        <label for="bars">Anzahl Bars:</label>
+                        <span id="barsValue"> 5</span>
                         <input type="range" min="2" max="8" value="5" class="slider" id="bars" onchange="updateSlider(this.value, 'barsValue')">
                     </div>
                     <div class="form-group">
@@ -100,8 +107,14 @@
         </div>
     </div>
 
-    <div id="map"></div>
-
+    <div class="row">
+        <div class="col-md-9">
+            <div id="map"></div>
+        </div>
+        <div class="col-md-3">
+            <h2>Pubs</h2>
+        </div>
+    </div>
     <div class="container">
         <footer>
             <p>CGI Hackathon HH &copy; 2018</p>
